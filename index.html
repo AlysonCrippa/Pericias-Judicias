@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sistema Pericial – Dr. Leandro T. Crippa</title>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e0ddd6;
+    --border-strong: #c8c4bc;
+    --text: #1a1a18;
+    --text-muted: #6b6963;
+    --text-hint: #9a9790;
+    --accent: #185fa5;
+    --accent-light: #e6f1fb;
+    --accent-hover: #0c447c;
+    --teal: #0f6e56;
+    --teal-light: #e1f5ee;
+    --amber: #854f0b;
+    --amber-light: #faeeda;
+    --purple: #534ab7;
+    --purple-light: #eeedfe;
+    --green: #3b6d11;
+    --green-light: #eaf3de;
+    --red: #a32d2d;
+    --red-light: #fcebeb;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: sans-serif;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-family: sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .header-sub {
+    font-family: sans-serif;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .api-config-btn {
+    margin-left: auto;
+    font-family: sans-serif;
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .api-config-btn:hover { background: var(--bg); }
+
+  .api-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+    flex-shrink: 0;
+  }
+
+  .api-status-dot.connected { background: var(--green); }
+
+  /* ── Layout ── */
+  .app-shell {
+    display: flex;
+    height: calc(100vh - 60px);
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 0.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 1rem 0.75rem 0.5rem;
+  }
+
+  .sidebar-label {
+    font-family: sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-hint);
+    padding: 0 0.5rem;
+    margin-bottom: 6px;
+  }
+
+  .step-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s;
+  }
+
+  .step-btn:hover { background: var(--bg); }
+  .step-btn.active { background: var(--accent-light); }
+
+  .step-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .step-icon.teal { background: var(--teal-light); color: var(--teal); }
+  .step-icon.blue { background: var(--accent-light); color: var(--accent); }
+  .step-icon.purple { background: var(--purple-light); color: var(--purple); }
+  .step-icon.amber { background: var(--amber-light); color: var(--amber); }
+
+  .step-info { flex: 1; min-width: 0; }
+
+  .step-name {
+    font-family: sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .step-desc {
+    font-family: sans-serif;
+    font-size: 11px;
+    color: var(--text-muted);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .step-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: white;
+  }
+
+  .step-check.done { background: var(--green); border-color: var(--green); }
+
+  .sidebar-divider {
+    height: 0.5px;
+    background: var(--border);
+    margin: 0.5rem 0.75rem;
+  }
+
+  .case-info-area {
+    padding: 0.75rem;
+    margin-top: auto;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .case-pill {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+  }
+
+  .case-pill-label {
+    font-family: sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-hint);
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .case-pill-value {
+    font-family: sans-serif;
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── Main Content ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  /* ── Panel Header ── */
+  .panel-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .panel-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .panel-icon.teal { background: var(--teal-light); color: var(--teal); }
+  .panel-icon.blue { background: var(--accent-light); color: var(--accent); }
+  .panel-icon.purple { background: var(--purple-light); color: var(--purple); }
+  .panel-icon.amber { background: var(--amber-light); color: var(--amber); }
+
+  .panel-title {
+    font-family: sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .panel-subtitle {
+    font-family: sans-serif;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-family: sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+  }
+
+  /* ── Upload Zone ── */
+  .upload-zone {
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius);
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .upload-icon {
+    font-size: 28px;
+    margin-bottom: 0.5rem;
+  }
+
+  .upload-text {
+    font-family: sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .upload-hint {
+    font-family: sans-serif;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .upload-files-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .upload-file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    font-family: sans-serif;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .upload-file-item span.icon { color: var(--red); }
+
+  .upload-file-remove {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 0 2px;
+  }
+
+  .upload-file-remove:hover { color: var(--red); }
+
+  /* ── Textarea ── */
+  textarea {
+    width: 100%;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    color: var(--text);
+    resize: vertical;
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.12s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+
+  label {
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    height: 36px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 0 10px;
+    font-family: sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.12s;
+  }
+
+  input[type="text"]:focus { border-color: var(--accent); }
+
+  .field-row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .field-row > div { flex: 1; }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.1s;
+  }
+
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { background: var(--border-strong); cursor: not-allowed; }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    background: transparent;
+    color: var(--text);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-family: sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .btn-secondary:hover { background: var(--bg); }
+
+  .btn-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Output Area ── */
+  .output-area {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    min-height: 200px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: none;
+    position: relative;
+  }
+
+  .output-area.visible { display: block; }
+  .output-area.streaming::after {
+    content: '▋';
+    animation: blink 0.8s step-end infinite;
+    color: var(--accent);
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .output-label {
+    font-family: sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ── Progress / Status ── */
+  .status-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--accent-light);
+    border: 0.5px solid #b5d4f4;
+    border-radius: var(--radius);
+    font-family: sans-serif;
+    font-size: 13px;
+    color: var(--accent-hover);
+  }
+
+  .status-bar.visible { display: flex; }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #b5d4f4;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status-bar.error {
+    background: var(--red-light);
+    border-color: #f09595;
+    color: var(--red);
+  }
+
+  .status-bar.success {
+    background: var(--green-light);
+    border-color: #c0dd97;
+    color: var(--green);
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.visible { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    width: 500px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  .modal-title {
+    font-family: sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 1.25rem;
+  }
+
+  .api-key-note {
+    font-family: sans-serif;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* ── Process context header ── */
+  .context-bar {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .ctx-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .ctx-key {
+    font-family: sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-hint);
+  }
+
+  .ctx-val {
+    font-family: sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .ctx-val.empty { color: var(--text-hint); font-weight: 400; }
+
+  /* ── Tag badge ── */
+  .badge {
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .badge.teal { background: var(--teal-light); color: var(--teal); }
+  .badge.blue { background: var(--accent-light); color: var(--accent); }
+  .badge.purple { background: var(--purple-light); color: var(--purple); }
+  .badge.amber { background: var(--amber-light); color: var(--amber); }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .sidebar { width: 200px; }
+    .main { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo-mark">LC</div>
+  <div>
+    <div class="header-title">Sistema Pericial</div>
+    <div class="header-sub">Dr. Leandro T. Crippa — CRM 126.889</div>
+  </div>
+  <button class="api-config-btn" onclick="openApiModal()">
+    <span class="api-status-dot" id="apiDot"></span>
+    <span id="apiLabel">Configurar API</span>
+  </button>
+</header>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Fluxo Pericial</div>
+
+      <button class="step-btn active" id="nav-prelaudo" onclick="showPanel('prelaudo')">
+        <div class="step-icon teal">1</div>
+        <div class="step-info">
+          <span class="step-name">Pré-laudo</span>
+          <span class="step-desc">PDF do processo</span>
+        </div>
+        <div class="step-check" id="check-prelaudo"></div>
+      </button>
+
+      <button class="step-btn" id="nav-poslaudo" onclick="showPanel('poslaudo')">
+        <div class="step-icon blue">2</div>
+        <div class="step-info">
+          <span class="step-name">Pós-laudo</span>
+          <span class="step-desc">Diligência pericial</span>
+        </div>
+        <div class="step-check" id="check-poslaudo"></div>
+      </button>
+
+      <button class="step-btn" id="nav-laudo" onclick="showPanel('laudo')">
+        <div class="step-icon purple">3</div>
+        <div class="step-info">
+          <span class="step-name">Laudo final</span>
+          <span class="step-desc">Conclusão e quesitos</span>
+        </div>
+        <div class="step-check" id="check-laudo"></div>
+      </button>
+
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Pós-protocolo</div>
+
+      <button class="step-btn" id="nav-esclarecimentos" onclick="showPanel('esclarecimentos')">
+        <div class="step-icon amber">4</div>
+        <div class="step-info">
+          <span class="step-name">Esclarecimentos</span>
+          <span class="step-desc">Impugnações das partes</span>
+        </div>
+        <div class="step-check" id="check-esclarecimentos"></div>
+      </button>
+    </div>
+
+    <div class="case-info-area">
+      <div class="case-pill">
+        <span class="case-pill-label">Processo ativo</span>
+        <span class="case-pill-value" id="sidebarProcess">—</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Context Bar (shows on all panels) -->
+    <div class="context-bar" id="contextBar">
+      <div class="ctx-item">
+        <span class="ctx-key">Processo</span>
+        <span class="ctx-val empty" id="ctxProcess">Não informado</span>
+      </div>
+      <div class="ctx-item">
+        <span class="ctx-key">Reclamante</span>
+        <span class="ctx-val empty" id="ctxReclamante">—</span>
+      </div>
+      <div class="ctx-item">
+        <span class="ctx-key">Reclamada</span>
+        <span class="ctx-val empty" id="ctxReclamada">—</span>
+      </div>
+      <div class="ctx-item">
+        <span class="ctx-key">Etapa</span>
+        <span class="ctx-val" id="ctxEtapa"><span class="badge teal">Pré-laudo</span></span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PAINEL 1 — PRÉ-LAUDO -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div class="panel active" id="panel-prelaudo">
+
+      <div class="panel-header">
+        <div class="panel-icon teal">1</div>
+        <div>
+          <div class="panel-title">Pré-laudo</div>
+          <div class="panel-subtitle">Extrai os dados do processo e preenche o modelo em branco para a diligência pericial</div>
+        </div>
+      </div>
+
+      <!-- Dados do processo -->
+      <div class="card">
+        <div class="card-title">Identificação do Processo</div>
+        <div class="field-row">
+          <div>
+            <label>Número do Processo</label>
+            <input type="text" id="numProcesso" placeholder="0000000-00.0000.0.00.0000" oninput="updateContext()"/>
+          </div>
+        </div>
+        <div class="field-row" style="margin-top: 0.75rem;">
+          <div>
+            <label>Reclamante</label>
+            <input type="text" id="reclamante" placeholder="Nome completo" oninput="updateContext()"/>
+          </div>
+          <div>
+            <label>Reclamada</label>
+            <input type="text" id="reclamada" placeholder="Razão social" oninput="updateContext()"/>
+          </div>
+        </div>
+        <div style="margin-top: 0.75rem;">
+          <label>Vara do Trabalho</label>
+          <input type="text" id="vara" placeholder="Ex: 56ª Vara do Trabalho de São Paulo – SP"/>
+        </div>
+      </div>
+
+      <!-- Upload PDF -->
+      <div class="card">
+        <div class="card-title">PDFs do Processo</div>
+        <div class="upload-zone" id="uploadZone1" onclick="document.getElementById('fileInput1').click()"
+             ondragover="ev.preventDefault();this.classList.add('dragover')"
+             ondragleave="this.classList.remove('dragover')"
+             ondrop="handleDrop(event, 'fileInput1', 'fileList1')">
+          <input type="file" id="fileInput1" accept=".pdf" multiple onchange="handleFiles(this, 'fileList1')"/>
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">Clique ou arraste os PDFs aqui</div>
+          <div class="upload-hint">Petição inicial, contestação, documentos médicos, quesitos</div>
+        </div>
+        <div class="upload-files-list" id="fileList1"></div>
+      </div>
+
+      <!-- Status + botão -->
+      <div class="status-bar" id="status1"></div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="gerarPreLaudo()">
+          ⚡ Gerar Pré-laudo
+        </button>
+        <button class="btn-secondary" onclick="showPanel('poslaudo')" id="btnNextPre" style="display:none">
+          Próxima etapa →
+        </button>
+      </div>
+
+      <!-- Output -->
+      <div id="outputHeader1" style="display:none">
+        <div class="output-header">
+          <span class="output-label">Pré-laudo gerado</span>
+          <div class="output-actions">
+            <button class="btn-secondary" onclick="copyOutput('output1')">📋 Copiar</button>
+            <button class="btn-secondary" onclick="downloadDocx('output1', 'pre-laudo')">⬇ Baixar .docx</button>
+          </div>
+        </div>
+      </div>
+      <div class="output-area" id="output1"></div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PAINEL 2 — PÓS-LAUDO -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div class="panel" id="panel-poslaudo">
+
+      <div class="panel-header">
+        <div class="panel-icon blue">2</div>
+        <div>
+          <div class="panel-title">Pós-laudo</div>
+          <div class="panel-subtitle">Complementa o pré-laudo com dados da diligência: anamnese, documentos novos e exame físico</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Dados da Diligência Pericial</div>
+
+        <div>
+          <label>Data e horário do exame pericial</label>
+          <input type="text" id="dataPericia" placeholder="Ex: 19/05/2026 às 13:20"/>
+        </div>
+
+        <div style="margin-top:0.75rem">
+          <label>Assistente técnico da Reclamada</label>
+          <input type="text" id="assistenteTec" placeholder="Nome e CRM, se houver"/>
+        </div>
+
+        <div style="margin-top:0.75rem">
+          <label>Assistente técnico do Reclamante</label>
+          <input type="text" id="assistenteTecRec" placeholder="Nome e CRM, se houver"/>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Anamnese e Exame Físico</div>
+        <div>
+          <label>Relato do periciando (anamnese)</label>
+          <textarea id="anamnese" rows="6" placeholder="Descreva as queixas, histórico da doença, comorbidades, vícios, medicamentos, hábitos, lazer, cirurgias anteriores..."></textarea>
+        </div>
+        <div style="margin-top:0.75rem">
+          <label>Exame físico — achados relevantes</label>
+          <textarea id="exameF" rows="4" placeholder="Descreva qualquer achado positivo ou atípico. Se tudo normal (conforme padrão), deixe em branco."></textarea>
+        </div>
+        <div style="margin-top:0.75rem">
+          <label>Exame psiquiátrico — observações (se aplicável)</label>
+          <textarea id="examePsi" rows="3" placeholder="Observações do exame psiquiátrico, se houver alterações em relação ao padrão."></textarea>
+        </div>
+        <div style="margin-top:0.75rem">
+          <label>Dados antropométricos</label>
+          <div class="field-row">
+            <div>
+              <input type="text" id="peso" placeholder="Peso (kg)"/>
+            </div>
+            <div>
+              <input type="text" id="altura" placeholder="Altura (cm)"/>
+            </div>
+            <div>
+              <input type="text" id="lateralidade" placeholder="Destro / Sinistro"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Documentos Novos Apresentados na Diligência</div>
+        <div class="upload-zone" id="uploadZone2" onclick="document.getElementById('fileInput2').click()"
+             ondragover="event.preventDefault();this.classList.add('dragover')"
+             ondragleave="this.classList.remove('dragover')"
+             ondrop="handleDrop(event, 'fileInput2', 'fileList2')">
+          <input type="file" id="fileInput2" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="handleFiles(this, 'fileList2')"/>
+          <div class="upload-icon">📎</div>
+          <div class="upload-text">Documentos novos (PDF ou imagens)</div>
+          <div class="upload-hint">Exames trazidos pelo periciando na consulta</div>
+        </div>
+        <div class="upload-files-list" id="fileList2"></div>
+      </div>
+
+      <div class="status-bar" id="status2"></div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="showPanel('prelaudo')">← Voltar</button>
+        <button class="btn-primary" onclick="gerarPosLaudo()">
+          ⚡ Gerar Pós-laudo
+        </button>
+        <button class="btn-secondary" onclick="showPanel('laudo')" id="btnNextPos" style="display:none">
+          Próxima etapa →
+        </button>
+      </div>
+
+      <div id="outputHeader2" style="display:none">
+        <div class="output-header">
+          <span class="output-label">Pós-laudo gerado</span>
+          <div class="output-actions">
+            <button class="btn-secondary" onclick="copyOutput('output2')">📋 Copiar</button>
+            <button class="btn-secondary" onclick="downloadDocx('output2', 'pos-laudo')">⬇ Baixar .docx</button>
+          </div>
+        </div>
+      </div>
+      <div class="output-area" id="output2"></div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PAINEL 3 — LAUDO FINAL -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div class="panel" id="panel-laudo">
+
+      <div class="panel-header">
+        <div class="panel-icon purple">3</div>
+        <div>
+          <div class="panel-title">Laudo Final</div>
+          <div class="panel-subtitle">Gera a discussão, critérios de Simonin, conclusão e respostas a todos os quesitos</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Orientações para a Conclusão</div>
+        <div>
+          <label>Diagnóstico(s) confirmado(s) no pós-laudo</label>
+          <textarea id="diagnosticos" rows="2" placeholder="Ex: Síndrome do Manguito Rotador esquerdo (CID M75.1) — CID confirmado no ato pericial"></textarea>
+        </div>
+        <div style="margin-top:0.75rem">
+          <label>Nexo — orientação (causal / concausal / sem nexo)</label>
+          <textarea id="nexoDir" rows="3" placeholder="Ex: Nexo concausal concorrente e moderado — 50%. Fator individual: obesidade grau I. Fator ocupacional: elevação repetitiva dos membros superiores por 10 anos."></textarea>
+        </div>
+        <div style="margin-top:0.75rem">
+          <label>Incapacidade — orientação</label>
+          <textarea id="incapDir" rows="2" placeholder="Ex: Não há incapacidade laborativa — exame físico sem limitação, sem afastamentos, sem tratamento atual comprovado."></textarea>
+        </div>
+        <div style="margin-top:0.75rem">
+          <label>Observações adicionais ao perito para a conclusão</label>
+          <textarea id="obsPerito" rows="3" placeholder="Qualquer detalhe do caso que deva aparecer nas considerações principais (achados relevantes, documentos ausentes, etc.)"></textarea>
+        </div>
+      </div>
+
+      <div class="status-bar" id="status3"></div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="showPanel('poslaudo')">← Voltar</button>
+        <button class="btn-primary" onclick="gerarLaudoFinal()">
+          ⚡ Gerar Laudo Final
+        </button>
+        <button class="btn-secondary" onclick="showPanel('esclarecimentos')" id="btnNextLaudo" style="display:none">
+          Protocolar e seguir →
+        </button>
+      </div>
+
+      <div id="outputHeader3" style="display:none">
+        <div class="output-header">
+          <span class="output-label">Laudo final gerado</span>
+          <div class="output-actions">
+            <button class="btn-secondary" onclick="copyOutput('output3')">📋 Copiar</button>
+            <button class="btn-secondary" onclick="downloadDocx('output3', 'laudo-final')">⬇ Baixar .docx</button>
+          </div>
+        </div>
+      </div>
+      <div class="output-area" id="output3"></div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PAINEL 4 — ESCLARECIMENTOS -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div class="panel" id="panel-esclarecimentos">
+
+      <div class="panel-header">
+        <div class="panel-icon amber">4</div>
+        <div>
+          <div class="panel-title">Esclarecimentos Periciais</div>
+          <div class="panel-subtitle">Responde às impugnações das partes com base exclusiva no laudo protocolado</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Impugnações</div>
+        <p style="font-family:sans-serif;font-size:13px;color:var(--text-muted);margin-bottom:1rem;">
+          Pode processar uma ou duas impugnações simultaneamente. Quando houver as duas, o sistema responde primeiro à Reclamante.
+        </p>
+        <div>
+          <label>Impugnação da parte Reclamante (se houver)</label>
+          <div class="upload-zone" id="uploadZoneImpRec" onclick="document.getElementById('fileImpRec').click()"
+               ondragover="event.preventDefault();this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="handleDrop(event, 'fileImpRec', 'fileListImpRec')">
+            <input type="file" id="fileImpRec" accept=".pdf" multiple onchange="handleFiles(this, 'fileListImpRec')"/>
+            <div class="upload-icon">📄</div>
+            <div class="upload-text">PDF da impugnação — Reclamante</div>
+          </div>
+          <div class="upload-files-list" id="fileListImpRec"></div>
+        </div>
+
+        <div style="margin-top:1rem">
+          <label>Impugnação da parte Reclamada (se houver)</label>
+          <div class="upload-zone" id="uploadZoneImpEmp" onclick="document.getElementById('fileImpEmp').click()"
+               ondragover="event.preventDefault();this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="handleDrop(event, 'fileImpEmp', 'fileListImpEmp')">
+            <input type="file" id="fileImpEmp" accept=".pdf" multiple onchange="handleFiles(this, 'fileListImpEmp')"/>
+            <div class="upload-icon">📄</div>
+            <div class="upload-text">PDF da impugnação — Reclamada</div>
+          </div>
+          <div class="upload-files-list" id="fileListImpEmp"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Laudo Pericial de Referência</div>
+        <div>
+          <label>Cole aqui o texto do laudo protocolado (ou use o gerado na etapa 3)</label>
+          <textarea id="laudoRef" rows="8" placeholder="Cole o texto completo do laudo pericial, especialmente a seção DISCUSSÃO E CONCLUSÃO..."></textarea>
+        </div>
+        <button class="btn-secondary" style="margin-top:0.75rem" onclick="importarLaudoAnterior()">
+          📋 Importar laudo da etapa 3
+        </button>
+      </div>
+
+      <div class="status-bar" id="status4"></div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="gerarEsclarecimentos()">
+          ⚡ Gerar Esclarecimentos
+        </button>
+      </div>
+
+      <div id="outputHeader4" style="display:none">
+        <div class="output-header">
+          <span class="output-label">Esclarecimentos gerados</span>
+          <div class="output-actions">
+            <button class="btn-secondary" onclick="copyOutput('output4')">📋 Copiar texto</button>
+          </div>
+        </div>
+      </div>
+      <div class="output-area" id="output4"></div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal API Key -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <div class="modal-title">Configuração da API</div>
+
+    <label>1. Chave API Anthropic (começa com sk-ant-…)</label>
+    <input type="text" id="apiKeyInput" placeholder="sk-ant-api03-..." style="margin-top:4px"/>
+
+    <label style="margin-top:1rem">2. URL do Proxy Cloudflare Worker</label>
+    <input type="text" id="proxyUrlInput" placeholder="https://pericia-proxy.SEU-USUARIO.workers.dev" style="margin-top:4px"/>
+
+    <div class="api-key-note">
+      <strong>Por que precisa de proxy?</strong> O GitHub Pages bloqueia chamadas diretas à API da Anthropic (política CORS do navegador). O Cloudflare Worker é um intermediário gratuito que resolve isso.<br><br>
+      <strong>Como criar o proxy (5 minutos, gratuito):</strong><br>
+      1. Acesse <a href="https://workers.cloudflare.com" target="_blank" style="color:var(--accent)">workers.cloudflare.com</a> e crie uma conta gratuita<br>
+      2. Clique em <strong>Create Worker</strong><br>
+      3. Substitua TODO o código pelo código abaixo e clique em <strong>Deploy</strong><br>
+      4. Copie a URL do worker (ex: <code>https://pericia-proxy.seu-usuario.workers.dev</code>) e cole acima<br><br>
+      <strong>Código do Worker (copie e cole inteiro):</strong>
+      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:6px;padding:8px;margin-top:6px;font-family:monospace;font-size:11px;white-space:pre-wrap;user-select:all;cursor:text">export default {
+  async fetch(request) {
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': '*',
+      }});
+    }
+    const url = new URL(request.url);
+    const target = 'https://api.anthropic.com' + url.pathname;
+    const res = await fetch(target, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+    });
+    const headers = new Headers(res.headers);
+    headers.set('Access-Control-Allow-Origin', '*');
+    return new Response(res.body, {
+      status: res.status,
+      headers,
+    });
+  }
+};</div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeApiModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveApiKey()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATE
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let apiKey = sessionStorage.getItem('pericia_apikey') || '';
+let proxyUrl = sessionStorage.getItem('pericia_proxy') || '';
+let fileSets = { fileInput1: [], fileInput2: [], fileImpRec: [], fileImpEmp: [] };
+let outputs = { output1: '', output2: '', output3: '', output4: '' };
+let currentPanel = 'prelaudo';
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   API KEY
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function openApiModal() {
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('proxyUrlInput').value = proxyUrl;
+  document.getElementById('apiModal').classList.add('visible');
+}
+function closeApiModal() {
+  document.getElementById('apiModal').classList.remove('visible');
+}
+function saveApiKey() {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  proxyUrl = document.getElementById('proxyUrlInput').value.trim().replace(/\/$/, '');
+  sessionStorage.setItem('pericia_apikey', apiKey);
+  sessionStorage.setItem('pericia_proxy', proxyUrl);
+  updateApiStatus();
+  closeApiModal();
+}
+function updateApiStatus() {
+  const dot = document.getElementById('apiDot');
+  const lbl = document.getElementById('apiLabel');
+  if (apiKey && proxyUrl) {
+    dot.classList.add('connected');
+    lbl.textContent = 'API conectada';
+  } else if (apiKey || proxyUrl) {
+    dot.classList.remove('connected');
+    lbl.textContent = 'Config. incompleta';
+  } else {
+    dot.classList.remove('connected');
+    lbl.textContent = 'Configurar API';
+  }
+}
+updateApiStatus();
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NAVIGATION
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const panelMap = {
+  prelaudo: { badge: 'teal', label: 'Pré-laudo' },
+  poslaudo: { badge: 'blue', label: 'Pós-laudo' },
+  laudo: { badge: 'purple', label: 'Laudo final' },
+  esclarecimentos: { badge: 'amber', label: 'Esclarecimentos' }
+};
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  currentPanel = name;
+  const info = panelMap[name];
+  document.getElementById('ctxEtapa').innerHTML = `<span class="badge ${info.badge}">${info.label}</span>`;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CONTEXT BAR
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function updateContext() {
+  const proc = document.getElementById('numProcesso').value.trim();
+  const rec = document.getElementById('reclamante').value.trim();
+  const emp = document.getElementById('reclamada').value.trim();
+  const setVal = (id, val, fallback) => {
+    const el = document.getElementById(id);
+    el.textContent = val || fallback;
+    el.classList.toggle('empty', !val);
+  };
+  setVal('ctxProcess', proc, 'Não informado');
+  setVal('ctxReclamante', rec, '—');
+  setVal('ctxReclamada', emp, '—');
+  document.getElementById('sidebarProcess').textContent = proc || '—';
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FILE HANDLING
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function handleFiles(input, listId) {
+  const newFiles = Array.from(input.files);
+  fileSets[input.id] = [...(fileSets[input.id] || []), ...newFiles];
+  renderFileList(input.id, listId);
+}
+
+function handleDrop(event, inputId, listId) {
+  event.preventDefault();
+  document.getElementById(inputId).closest('.upload-zone').classList.remove('dragover');
+  const newFiles = Array.from(event.dataTransfer.files).filter(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    return ['pdf','jpg','jpeg','png'].includes(ext);
+  });
+  fileSets[inputId] = [...(fileSets[inputId] || []), ...newFiles];
+  renderFileList(inputId, listId);
+}
+
+function renderFileList(inputId, listId) {
+  const list = document.getElementById(listId);
+  list.innerHTML = '';
+  (fileSets[inputId] || []).forEach((file, i) => {
+    const item = document.createElement('div');
+    item.className = 'upload-file-item';
+    item.innerHTML = `<span class="icon">📄</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${file.name}</span><span style="color:var(--text-muted);font-size:11px;margin-left:4px">${(file.size/1024).toFixed(0)}kb</span><button class="upload-file-remove" onclick="removeFile('${inputId}', ${i}, '${listId}')">✕</button>`;
+    list.appendChild(item);
+  });
+}
+
+function removeFile(inputId, index, listId) {
+  fileSets[inputId].splice(index, 1);
+  renderFileList(inputId, listId);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PDF → BASE64
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATUS HELPERS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function setStatus(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'status-bar visible ' + (type || '');
+  el.innerHTML = type === 'loading'
+    ? `<div class="spinner"></div><span>${msg}</span>`
+    : `<span>${msg}</span>`;
+  if (type === 'success' || type === 'error') {
+    setTimeout(() => el.classList.remove('visible'), 4000);
+  }
+}
+
+function markDone(step) {
+  const el = document.getElementById('check-' + step);
+  el.classList.add('done');
+  el.innerHTML = '✓';
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CALL ANTHROPIC API (STREAMING)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function callAPI(systemPrompt, userContent, outputId) {
+  if (!apiKey) {
+    openApiModal();
+    throw new Error('API key não configurada');
+  }
+  if (!proxyUrl) {
+    openApiModal();
+    throw new Error('URL do proxy não configurada — siga as instruções de configuração');
+  }
+
+  const endpoint = proxyUrl + '/v1/messages';
+
+  const outputEl = document.getElementById(outputId);
+  outputEl.className = 'output-area visible streaming';
+  outputEl.textContent = '';
+  outputs[outputId] = '';
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-beta': 'pdfs-2024-09-25'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 8000,
+      stream: true,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userContent }]
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Erro HTTP ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6).trim();
+      if (data === '[DONE]') continue;
+      try {
+        const evt = JSON.parse(data);
+        if (evt.type === 'content_block_delta' && evt.delta?.text) {
+          outputs[outputId] += evt.delta.text;
+          outputEl.textContent = outputs[outputId];
+          outputEl.scrollTop = outputEl.scrollHeight;
+        }
+      } catch {}
+    }
+  }
+
+  outputEl.classList.remove('streaming');
+  return outputs[outputId];
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AGENT 1 — PRÉ-LAUDO
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function gerarPreLaudo() {
+  const proc = document.getElementById('numProcesso').value.trim();
+  const rec = document.getElementById('reclamante').value.trim();
+  const emp = document.getElementById('reclamada').value.trim();
+  const vara = document.getElementById('vara').value.trim();
+  const files = fileSets['fileInput1'] || [];
+
+  if (!proc && files.length === 0) {
+    setStatus('status1', 'error', '⚠ Informe o número do processo ou faça upload de ao menos um PDF.');
+    return;
+  }
+
+  setStatus('status1', 'loading', 'Lendo PDFs e gerando pré-laudo...');
+  document.getElementById('outputHeader1').style.display = 'none';
+
+  try {
+    const contentParts = [];
+    for (const file of files) {
+      if (file.type === 'application/pdf') {
+        const b64 = await fileToBase64(file);
+        contentParts.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } });
+      }
+    }
+    contentParts.push({
+      type: 'text',
+      text: `DADOS IDENTIFICADOS PELO USUÁRIO:
+Processo: ${proc || '(extrair do PDF)'}
+Reclamante: ${rec || '(extrair do PDF)'}
+Reclamada: ${emp || '(extrair do PDF)'}
+Vara: ${vara || '(extrair do PDF)'}
+
+Gere agora o PRÉ-LAUDO completo conforme as instruções do sistema.`
+    });
+
+    const system = AGENT_PRELAUDO;
+    await callAPI(system, contentParts, 'output1');
+    document.getElementById('outputHeader1').style.display = 'block';
+    document.getElementById('output1').classList.add('visible');
+    document.getElementById('btnNextPre').style.display = 'inline-flex';
+    markDone('prelaudo');
+    setStatus('status1', 'success', '✓ Pré-laudo gerado com sucesso');
+  } catch (e) {
+    setStatus('status1', 'error', '✗ Erro: ' + e.message);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AGENT 2 — PÓS-LAUDO
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function gerarPosLaudo() {
+  const prelaudo = outputs['output1'];
+  if (!prelaudo) {
+    setStatus('status2', 'error', '⚠ Gere o pré-laudo na etapa 1 antes de continuar.');
+    return;
+  }
+
+  const anamnese = document.getElementById('anamnese').value.trim();
+  const exameF = document.getElementById('exameF').value.trim();
+  const examePsi = document.getElementById('examePsi').value.trim();
+  const peso = document.getElementById('peso').value.trim();
+  const altura = document.getElementById('altura').value.trim();
+  const lat = document.getElementById('lateralidade').value.trim();
+  const data = document.getElementById('dataPericia').value.trim();
+  const assTec = document.getElementById('assistenteTec').value.trim();
+  const assTecRec = document.getElementById('assistenteTecRec').value.trim();
+  const files2 = fileSets['fileInput2'] || [];
+
+  setStatus('status2', 'loading', 'Complementando com dados da diligência...');
+  document.getElementById('outputHeader2').style.display = 'none';
+
+  try {
+    const contentParts = [];
+    for (const file of files2) {
+      const b64 = await fileToBase64(file);
+      const mt = file.type.startsWith('image') ? file.type : 'application/pdf';
+      if (file.type.startsWith('image')) {
+        contentParts.push({ type: 'image', source: { type: 'base64', media_type: mt, data: b64 } });
+      } else {
+        contentParts.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } });
+      }
+    }
+    contentParts.push({
+      type: 'text',
+      text: `PRÉ-LAUDO (BASE):
+${prelaudo}
+
+DADOS DA DILIGÊNCIA PERICIAL:
+Data/horário do exame: ${data || 'não informado'}
+Assistente técnico da Reclamada: ${assTec || 'não houve'}
+Assistente técnico do Reclamante: ${assTecRec || 'não houve'}
+Peso: ${peso || '?'} kg | Altura: ${altura || '?'} cm | Lateralidade: ${lat || '?'}
+
+ANAMNESE (relato do periciando):
+${anamnese || '(não informado — manter espaços em branco para preenchimento manual)'}
+
+EXAME FÍSICO — achados relevantes:
+${exameF || '(todos os testes e inspeções dentro dos padrões normais — usar texto padrão do modelo)'}
+
+EXAME PSIQUIÁTRICO — observações:
+${examePsi || '(dentro dos padrões normais — usar texto padrão do modelo)'}
+
+${files2.length > 0 ? 'DOCUMENTOS NOVOS TRAZIDOS NA DILIGÊNCIA: ver arquivos anexados acima.' : '(Nenhum documento novo trazido na diligência)'}
+
+Gere agora o PÓS-LAUDO completo conforme as instruções do sistema.`
+    });
+
+    await callAPI(AGENT_POSLAUDO, contentParts, 'output2');
+    document.getElementById('outputHeader2').style.display = 'block';
+    document.getElementById('output2').classList.add('visible');
+    document.getElementById('btnNextPos').style.display = 'inline-flex';
+    markDone('poslaudo');
+    setStatus('status2', 'success', '✓ Pós-laudo gerado com sucesso');
+  } catch (e) {
+    setStatus('status2', 'error', '✗ Erro: ' + e.message);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AGENT 3 — LAUDO FINAL
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function gerarLaudoFinal() {
+  const poslaudo = outputs['output2'] || outputs['output1'];
+  if (!poslaudo) {
+    setStatus('status3', 'error', '⚠ Complete a etapa 2 antes de gerar o laudo final.');
+    return;
+  }
+
+  const diag = document.getElementById('diagnosticos').value.trim();
+  const nexo = document.getElementById('nexoDir').value.trim();
+  const incap = document.getElementById('incapDir').value.trim();
+  const obs = document.getElementById('obsPerito').value.trim();
+
+  setStatus('status3', 'loading', 'Gerando conclusão, Simonin e respostas aos quesitos...');
+  document.getElementById('outputHeader3').style.display = 'none';
+
+  try {
+    const userText = `PÓS-LAUDO (BASE COMPLETA):
+${poslaudo}
+
+ORIENTAÇÕES DO PERITO PARA A CONCLUSÃO:
+Diagnósticos confirmados: ${diag || '(extrair do pós-laudo)'}
+Nexo — direção: ${nexo || '(definir com base nos dados do caso)'}
+Incapacidade — direção: ${incap || '(definir com base no exame físico)'}
+Observações adicionais: ${obs || '(nenhuma observação adicional)'}
+
+Gere agora o LAUDO FINAL completo com todas as seções de conclusão e respostas aos quesitos.`;
+
+    await callAPI(AGENT_LAUDO_FINAL, [{ type: 'text', text: userText }], 'output3');
+    document.getElementById('outputHeader3').style.display = 'block';
+    document.getElementById('output3').classList.add('visible');
+    document.getElementById('btnNextLaudo').style.display = 'inline-flex';
+    markDone('laudo');
+    setStatus('status3', 'success', '✓ Laudo final gerado com sucesso');
+  } catch (e) {
+    setStatus('status3', 'error', '✗ Erro: ' + e.message);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AGENT 4 — ESCLARECIMENTOS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function importarLaudoAnterior() {
+  const laudoGerado = outputs['output3'] || outputs['output2'] || outputs['output1'];
+  if (!laudoGerado) {
+    alert('Nenhum laudo gerado ainda. Complete as etapas anteriores primeiro.');
+    return;
+  }
+  document.getElementById('laudoRef').value = laudoGerado;
+}
+
+async function gerarEsclarecimentos() {
+  const laudoRef = document.getElementById('laudoRef').value.trim();
+  const filesRec = fileSets['fileImpRec'] || [];
+  const filesEmp = fileSets['fileImpEmp'] || [];
+
+  if (!laudoRef) {
+    setStatus('status4', 'error', '⚠ Cole o texto do laudo de referência ou importe da etapa 3.');
+    return;
+  }
+  if (filesRec.length === 0 && filesEmp.length === 0) {
+    setStatus('status4', 'error', '⚠ Faça upload de ao menos uma impugnação.');
+    return;
+  }
+
+  setStatus('status4', 'loading', 'Analisando impugnações e gerando esclarecimentos...');
+  document.getElementById('outputHeader4').style.display = 'none';
+
+  try {
+    const contentParts = [];
+
+    if (filesRec.length > 0) {
+      contentParts.push({ type: 'text', text: '=== IMPUGNAÇÃO DA PARTE RECLAMANTE ===' });
+      for (const file of filesRec) {
+        const b64 = await fileToBase64(file);
+        contentParts.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } });
+      }
+    }
+    if (filesEmp.length > 0) {
+      contentParts.push({ type: 'text', text: '=== IMPUGNAÇÃO DA PARTE RECLAMADA ===' });
+      for (const file of filesEmp) {
+        const b64 = await fileToBase64(file);
+        contentParts.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } });
+      }
+    }
+
+    contentParts.push({
+      type: 'text',
+      text: `=== LAUDO PERICIAL DE REFERÊNCIA ===
+${laudoRef}
+
+Gere agora os ESCLARECIMENTOS PERICIAIS conforme as instruções do sistema.`
+    });
+
+    await callAPI(AGENT_ESCLARECIMENTOS, contentParts, 'output4');
+    document.getElementById('outputHeader4').style.display = 'block';
+    document.getElementById('output4').classList.add('visible');
+    markDone('esclarecimentos');
+    setStatus('status4', 'success', '✓ Esclarecimentos gerados com sucesso');
+  } catch (e) {
+    setStatus('status4', 'error', '✗ Erro: ' + e.message);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   OUTPUT UTILS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function copyOutput(id) {
+  const text = outputs[id] || document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Texto copiado para a área de transferência.');
+  });
+}
+
+function downloadDocx(outputId, tipo) {
+  const text = outputs[outputId] || document.getElementById(outputId).textContent;
+  const proc = document.getElementById('numProcesso').value.trim() || 'processo';
+  const rec = document.getElementById('reclamante').value.trim() || 'reclamante';
+  const emp = document.getElementById('reclamada').value.trim() || 'reclamada';
+  const filename = `${tipo}_${proc}_${rec.split(' ')[0]}_x_${emp.split(' ')[0]}.txt`;
+
+  // Download as .txt — the server-side docx generation would need Node.js
+  // For a pure browser version, we deliver formatted text the user pastes into Word
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ██ PROMPTS DOS AGENTES ██
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+const AGENT_PRELAUDO = `Você é assistente do Dr. Leandro Teodoro Crippa (CRM/SP 126.889), perito médico judicial em processos trabalhistas no TRT. Sua única tarefa neste momento é escrever o PRÉ-LAUDO médico-pericial: o modelo em branco preenchido com os dados extraídos do processo judicial enviado pelo usuário.
+
+ESTRUTURA OBRIGATÓRIA (siga esta ordem e títulos exatos):
+
+CABEÇALHO
+EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DA [vara] DE SÃO PAULO – SP
+PROCESSO: [número]
+RECLAMANTE: [nome em maiúsculas]
+RECLAMADA: [nome em maiúsculas]
+LEANDRO TEODORO CRIPPA, CRM: 126.889, Perito nomeado nos Autos do Processo supra, vem respeitosamente fazer a entrega de Laudo Médico Pericial, desincumbindo-se da honrosa tarefa. O trabalho contém XX laudas, enviadas de maneira eletrônica, protegido por senha pelo sistema PJe do Tribunal Regional do Trabalho.
+São Paulo, [data atual por extenso]
+
+---
+
+1. CONSIDERAÇÕES PRELIMINARES
+1.1. IDENTIFICAÇÃO DO PERITO
+NOME: Leandro Teodoro Crippa
+ENDEREÇO PROFISSIONAL: Rua Almirante Brasil, 685, sala 402 - Mooca, São Paulo.
+E-MAIL: periciasjudiciais.crippa@gmail.com
+
+1.2. QUALIFICAÇÃO DO PERITO
+• Graduação em Medicina pela Universidade Estadual de Londrina – UEL - 2006.
+• Residência Médica em Cirurgia Geral e Cirurgia Geral Avançada pela Universidade Estadual Paulista – UNESP e pela Faculdade de Medicina da Universidade de São Paulo – USP.
+• Especialista em Cirurgia do Aparelho Digestivo - Colégio Brasileiro de Cirurgia Digestiva.
+• Especialista em Cirurgia Bariátrica e Metabólica, pela Associação Médica Brasileira – AMB e pela Sociedade Brasileira de Cirurgia Bariátrica e Metabólica.
+• Pós-Graduado em Perícias Médicas, Ministério da Educação - MEC
+• Pós-Graduado em Psiquiatria, Ministério da Educação - MEC
+
+1.3. FUNDAMENTAÇÃO JURÍDICA
+[Inserir a fundamentação jurídica padrão completa — Constituição Federal, Convenções OIT, Lei 13.105/2015, Lei 6.514/1977, Lei 8.080/1990, Lei 8.213/1991, Lei 11.430/2006, Lei 12.842/2013, Decreto-Lei 5.452/1943, Decreto 3048/1999, Decreto 6042/2007, Portaria MS 1339/1999, IN INSS 31/2008, Resolução DC INSS 10/1999, Portaria MTE 3.214/1978, IN 88/2010, Resolução CFM 2323/2022, Resolução CFM 1.851/2008, Resolução CFM 2056/2013, Diretrizes CSJT Res. 324/2022]
+
+1.4. METODOLOGIA
+• Leitura prévia dos Autos do Processo.
+• Anamnese pormenorizada (ao menos uma entrevista realizada com o autor).
+• Utilização do método hipotético-dedutivo e de reconhecimento de padrões.
+• Exame físico e psiquiátrico (quando relacionado) completo.
+• Análise documental dos atestados, receituários, exames e prontuários acostados aos autos, ou apresentados no Ato Pericial.
+• Consulta bibliográfica, dando ênfase a artigos de medicina baseada em evidências.
+• Análise da atividade laboral do Autor na reclamada.
+
+---
+
+2. OBJETIVOS, INICIAL E CONTESTAÇÃO
+[Parágrafo introdutório padrão sobre a finalidade da perícia]
+
+2.1. ALEGAÇÃO INICIAL RELACIONADA À PATOLOGIA:
+"[Extrair APENAS o trecho da petição inicial que descreve a patologia/doença alegada como ocupacional. Citação direta entre aspas. Terminar com (...)".]"
+
+2.2 CONTESTAÇÃO:
+"[Extrair APENAS a defesa médica da contestação relativa à patologia. Citação direta. Terminar com (...)".]"
+
+---
+
+3. HISTÓRICO DO TRABALHO PERICIAL
+Data e horário do exame médico pericial: [deixar em branco — será preenchido na diligência]
+Local do exame médico pericial: Rua Almirante Brasil, 685, sala 402 - Mooca, São Paulo
+Assistente técnico da Reclamada: [se indicado nos autos]
+Assistente técnico do Reclamante: [se indicado nos autos]
+
+---
+
+4. IDENTIFICAÇÃO DO PERICIANDO
+Nome: [nome completo], [idade] anos.
+Data de nascimento: [data]
+CPF: [CPF]
+Profissão atual: [deixar em branco]
+
+---
+
+5. IDENTIFICAÇÃO DA EMPRESA RECLAMADA
+[Razão social] - CNPJ: [CNPJ]
+
+---
+
+6. HISTÓRICO PROFISSIONAL E PREVIDENCIÁRIO
+• CTPS - [CONSTA / NÃO CONSTA] NOS AUTOS.
+
+6.1 HISTÓRICO PREVIDENCIÁRIO – [afastamentos INSS se houver, ou "NÃO TEVE AFASTAMENTO"]
+
+---
+
+7. O LABOR NA RECLAMADA
+• Período: [admissão] à [demissão] ([forma de saída se conhecida])
+• Funções: [cargos exercidos]
+• [Jornada, atividades, salário se constarem nos autos]
+
+---
+
+8. HISTÓRICO DA DOENÇA ALEGADA NA INICIAL
+• Conforme relato do(a) Autor(a) e sob a responsabilidade do(a) mesmo(a). Sem presunção de veracidade pelo perito e não contempla juízo de valor ou alterações de seu conteúdo.
+
+Comorbidades: [deixar em branco]
+Medicamentos: [deixar em branco]
+Hábitos e lazer: [deixar em branco]
+Cirurgias: [só preencher se houver documentação nos autos]
+
+---
+
+9. EXAME FÍSICO
+Destro/Sinistro. Peso: ___ kg Altura: ___ cm
+
+[REGIÕES CORPORAIS PERTINENTES À PATOLOGIA ALEGADA — apenas as relevantes, com texto padrão de normalidade. Exemplos de regiões: MÃOS E PUNHOS E DEDOS, OMBROS, JOELHOS, COTOVELOS, COLUNA VERTEBRAL, OLHOS, EXAME PSIQUIÁTRICO. Deixar todos os achados em branco — serão preenchidos na diligência]
+
+---
+
+10. DESCRIÇÃO DOS DOCUMENTOS MÉDICOS DOS AUTOS
+
+DATA | DOCUMENTO E DESCRIÇÃO
+[Tabela em ordem cronológica com TODOS os documentos médicos dos autos: atestados, exames de imagem, relatórios médicos, ASO, PCMSO, PGR, LTCAT, PPRA, CAT, se constarem. Se não constarem os documentos da empresa (PGR, PCMSO, PPRA, LTCAT), registrar: "A RECLAMADA NÃO ANEXOU LAUDOS: PGR; PCMSO; PPRA; LTCAT."]
+
+---
+
+11. ANÁLISE DA PATOLOGIA ALEGADA
+[Para cada patologia identificada: síntese médica teórica em texto corrido (sem bullets), integrando etiologia, fisiopatologia, fatores de risco, quadro clínico, diagnóstico e tratamento. Mencionar a relação com trabalho quando a literatura reconhece.]
+
+---
+
+12. DISCUSSÃO E CONCLUSÃO
+
+12.1. QUANTO AOS DIAGNÓSTICOS
+[Deixar em branco — será preenchido após a diligência]
+
+12.2. QUANTO AO NEXO CAUSAL E QUANTO À AVALIAÇÃO DA INCAPACIDADE
+[Deixar em branco — será preenchido após a diligência]
+
+---
+
+13. RESPOSTAS AOS QUESITOS
+
+13.1 QUESITOS DO JUIZ – ATA DA AUDIÊNCIA
+[Copiar exatamente da ata, com "R:" vazio após cada um]
+
+13.2 QUESITOS DO RECLAMANTE
+[Copiar exatamente como apresentados. "R:" vazio. Se não houver: "Não foram apresentados quesitos formais pelo Reclamante."]
+
+13.3 QUESITOS DA RECLAMADA
+[Copiar exatamente como apresentados. "R:" vazio.]
+
+---
+
+14. CONSIDERAÇÕES FINAIS
+No âmbito judicial, o juiz não está adstrito ao laudo pericial, podendo formar a sua convicção com puros elementos ou fatos provados nos autos (artigo 479 do Novo CPC). Todas as informações complementares estão transcritas na íntegra das disposições estabelecidas na Lei n. 13105/2015 de 16/03/2015.
+
+Como perito nomeado neste caso, estou consciente da importância do meu papel e da necessidade de fornecer um parecer o mais completo e preciso possível com base nas informações disponíveis no momento da minha avaliação. No entanto, reconheço que a evolução natural do processo pode levar ao surgimento de novos fatos, provas ou alegações que possam requerer uma revisão ou modificação do meu laudo inicial.
+
+Sendo assim, mediante a apresentação de novas informações ou evidências que possam ter um impacto significativo na minha avaliação pericial, reservo-me o direito de revisar e possivelmente modificar o meu laudo, de forma a garantir a máxima precisão e justiça no desenrolar deste processo.
+
+Continuo à disposição para esclarecimentos adicionais que se fizerem necessários. Aproveito para reiterar minha disposição em colaborar em futuras ocasiões, sempre buscando contribuir para a efetiva e justa aplicação da lei.
+
+Respeitosamente,
+
+Leandro Teodoro Crippa
+CRM: 126.889
+Perito Médico Judicial
+
+---
+
+REGRAS ABSOLUTAS:
+- Sem placeholders do tipo [PREENCHER] ou [ANAMNESE]. Campos vazios ficam em branco.
+- Citações entre aspas tipográficas.
+- Bullets com • (não traços).
+- Escreva em português jurídico-médico formal.
+- Nunca invente dados que não estejam nos documentos.
+- Após o laudo, inclua um RESUMO EXECUTIVO de até 10 linhas: partes, vínculo, patologia alegada, principais documentos, pontos de atenção para a diligência.`;
+
+const AGENT_POSLAUDO = `Você é assistente do Dr. Leandro Teodoro Crippa (CRM/SP 126.889), perito médico judicial. Sua tarefa é gerar o PÓS-LAUDO: o pré-laudo preenchido com todos os dados coletados na diligência pericial (anamnese, exame físico, documentos novos).
+
+Você receberá:
+1. O PRÉ-LAUDO (base com seções preenchidas e seções em branco)
+2. Os dados da diligência: anamnese, exame físico, dados antropométricos, documentos novos
+
+SUA TAREFA:
+- Reproduza o pré-laudo INTEGRALMENTE, preenchendo APENAS os campos que estavam em branco e que agora têm dados fornecidos.
+- Seção 3 (Histórico do Trabalho Pericial): preencher data/horário e assistentes técnicos.
+- Seção 8 (Histórico da Doença): preencher com os dados da anamnese (comorbidades, medicamentos, hábitos, cirurgias, relato cronológico).
+- Seção 9 (Exame Físico): preencher peso, altura, lateralidade. Se houver achados anormais no exame físico, substitua o padrão de normalidade pelos achados reais. Se o exame psiquiátrico tiver observações, incorpore-as.
+- Se foram trazidos documentos novos na diligência, adicione-os à Seção 10 (tabela de documentos), mantendo ordem cronológica.
+- NÃO preencha ainda as seções 12.1, 12.2 e as respostas "R:" dos quesitos — essas serão geradas pelo agente de conclusão.
+- Mantenha TODAS as seções, títulos e numeração originais. Não altere o que já estava preenchido.
+- NÃO adicione comentários, notas ou marcações suas.
+
+REGRAS DE FORMATO:
+- Português jurídico-médico formal.
+- Bullets com •
+- Tabela de documentos: DATA | DOCUMENTO E DESCRIÇÃO, ordem cronológica, uma linha por documento.
+- Citações entre aspas.
+- Texto corrido na seção 11 (sem bullets).`;
+
+const AGENT_LAUDO_FINAL = `Você é o Dr. Leandro Teodoro Crippa (CRM/SP 126.889), perito médico judicial. Você está escrevendo na primeira pessoa como autor do laudo. Sua tarefa é completar o PÓS-LAUDO gerando:
+
+1. Seção 12.1 — QUANTO AOS DIAGNÓSTICOS: lista dos diagnósticos com CID-10.
+
+2. Seção 12.2 — QUANTO AO NEXO CAUSAL E QUANTO À AVALIAÇÃO DA INCAPACIDADE:
+   - Parágrafo de identificação do periciando e vínculo
+   - Linha separadora
+   - PRINCIPAIS CONSIDERAÇÕES DO PERITO (numeradas, em negrito): 3 a 5 itens desenvolvidos analisando o nexo com base nos dados do caso
+   - ANÁLISE PELOS CRITÉRIOS DE SIMONIN (5 critérios numerados em negrito):
+     1. Critério de Cronologia / Temporalidade
+     2. Critério de Intensidade
+     3. Critério de Especificidade
+     4. Critério de Coerência
+     5. Critério de Exclusão de Outras Causas
+   - Linha separadora
+   - CONCLUSÃO (em negrito): resumo conclusivo sobre nexo (causal/concausal/sem nexo) e incapacidade, com citação do artigo legal pertinente se houver nexo.
+
+3. Respostas "R:" para TODOS os quesitos das seções 13.1, 13.2 e 13.3: respostas objetivas, diretas, curtas, coerentes com a conclusão. Em maiúsculas e negrito.
+
+REPRODUZA o pós-laudo completo com essas seções preenchidas. Mantenha todas as demais seções intactas.
+
+PRINCÍPIOS DA CONCLUSÃO:
+- Baseie-se EXCLUSIVAMENTE nos dados do pós-laudo: exame físico, documentos médicos, histórico laboral, anamnese.
+- Aplique os Critérios de Simonin com rigor.
+- Se há fator individual relevante (obesidade, idade, degeneração), qualifique o nexo como concausal com percentual estimado.
+- Se o exame físico não mostra limitação funcional e não há afastamentos comprovados, conclua pela ausência de incapacidade laborativa atual.
+- Use as orientações do perito fornecidas pelo usuário como direção principal.
+- Linguagem médico-pericial formal, texto corrido, sem bullets nas considerações.`;
+
+const AGENT_ESCLARECIMENTOS = `Você é o Dr. Leandro Teodoro Crippa (CRM/SP 126.889), perito médico judicial altamente qualificado. Sua tarefa é redigir esclarecimentos periciais conclusivos e fundamentados para responder às impugnações apresentadas ao laudo pericial.
+
+REGRAS ABSOLUTAS:
+1. A fundamentação deve ser baseada EXCLUSIVAMENTE no conteúdo do laudo pericial fornecido — especialmente na DISCUSSÃO E CONCLUSÃO.
+2. Nunca concorde com algo da impugnação que leve a uma fundamentação contrária ao laudo.
+3. Não acrescente dados externos, não use bibliografia, não invente fundamentos.
+4. Jamais mencione o laudo como documento externo. Frases como "o laudo pericial concluiu" ou "segundo o laudo" estão PROIBIDAS. Assuma as conclusões como suas.
+5. Quando houver duas impugnações, comece sempre pela parte Reclamante.
+
+ESTRUTURA DOS ESCLARECIMENTOS:
+- Inicie com: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DA [vara]" e cabeçalho do processo.
+- Para cada tema impugnado: título em negrito "Quanto à [tema]" seguido de 2 a 3 parágrafos de resposta.
+- Se houver quesitos, transcrevê-los integralmente e responder em negrito com "R:" após cada um, com linha em branco entre quesitos.
+- Encerrar com: "CONSIDERAÇÕES FINAIS" e assinatura.
+
+ESTILO:
+- Voz passiva, terceira pessoa, tom impessoal e profissional.
+- Frases curtas, diretas, sem termos vagos.
+- Texto fluido, natural, humano — não robotizado.
+- Sem listas ou marcadores — apenas parágrafos corridos.
+- Sem travessão duplo — use vírgula ou parênteses.
+- Seja objetivo e conciso. Escreva apenas o necessário.
+- Separe claramente a fundamentação sobre nexo da fundamentação sobre incapacidade.
+
+PALAVRAS PROIBIDAS: "pode", "aparentemente", "significativo", "relevante", "comprovado", "comprovação", "probatório", "comprobatório", "técnica" (como advérbio), "tecnicamente".`;
+
+</script>
+</body>
+</html>
